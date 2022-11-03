@@ -45,10 +45,10 @@ def get_homograph_mat(pts1, pts2):
     ind = 0
     # Build the A matrix Ah=0
     for i, (pt1, pt2) in enumerate(zip(pts1, pts2)):
-        x = (pt1[0][0])
-        y = (pt1[0][1])
-        xd = (pt2[0][0])
-        yd = (pt2[0][1])
+        x = pt1[0][0]
+        y = pt1[0][1]
+        xd = pt2[0][0]
+        yd = pt2[0][1]
         x_xd = x * xd
         y_xd = y * xd
         x_yd = x * yd
