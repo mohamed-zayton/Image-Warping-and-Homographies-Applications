@@ -36,8 +36,6 @@ def get_matched_pt(kpt, matched_list, num_pts=50):
     return pts
 
 # Get the homograph matrix using the SVD
-
-
 def get_homograph_mat(pts1, pts2):
     a_mat = np.zeros((pts1.shape[0] * 2, 9))
     ind = 0
