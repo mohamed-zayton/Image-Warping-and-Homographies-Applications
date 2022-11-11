@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
+import math
 
 # 1.1 Getting Correspondences
 # Feature of the two image using SIFT
@@ -110,3 +112,15 @@ def compute_homography_ransac(matches_a, matches_b, CONFIDENCE_THRESH = 65):
         raise('Coudn\'t obtain confidence ratio higher than the CONFIDENCE THRESH')
 
     return best_h_mat
+
+
+def show_image(img, x_axes_visible = False, y_axes_visible = False):
+  ax = None
+  if len(img.shape) == 3:
+    ax = plt.imshow(img[:,:,::-1])
+  else:
+    ax = plt.imshow(img, cmap='gray', vmin=0, vmax=255)
+
+  ax.axes.get_xaxis().set_visible(x_axes_visible)
+  ax.axes.get_yaxis().set_visible(y_axes_visible)
+  plt.show()
