@@ -16,16 +16,17 @@ def get_image_sift_feature(img):
 # Get the matched feature between the two image
 
 
-def get_matches(des1, des2, ratio=0.5, knn_num=2):
+def get_matches(des1, des2, ratio=0.75):
     # Brute force matcher
     bf = cv2.BFMatcher()
     # match descriptors of both images
-    matches = bf.knnMatch(des1, des2, k=knn_num)
+    matches = bf.knnMatch(des1, des2, k=2)
     matches_list = []
     for m, n in matches:
         if m.distance < ratio * n.distance:
             matches_list.append([m])
-    return matches_list
+
+    return sorted(matches_list,key=lambda x:x[0].distance) # sort results from the best keypoints to worst
 
 # 1.2 Compute the Homography Parameters
 # The point that match the 2 image
