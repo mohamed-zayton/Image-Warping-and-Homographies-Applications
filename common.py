@@ -3,6 +3,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 import math
 
+# RANSAC parameters
+SAMPLE_SIZE = 5 #number of point correspondances for estimation of Homgraphy
+SUCCESS_PROB = 0.995 #required probabilty of finding H with all samples being inliners
+
 # 1.1 Getting Correspondences
 # Feature of the two image using SIFT
 def get_image_sift_feature(img):
@@ -97,9 +101,6 @@ def compute_outliers(h_mat, points_img_a, points_img_b, threshold):
 
 def compute_homography_ransac(pts_dst, pts_src, CONFIDENCE_THRESH = 65, OUTLIER_DIS_THRESH = 3):
     num_all_matches =  pts_dst.shape[0]
-    # RANSAC parameters
-    SAMPLE_SIZE = 5 #number of point correspondances for estimation of Homgraphy
-    SUCCESS_PROB = 0.995 #required probabilty of finding H with all samples being inliners 
     min_iterations = int(np.log(1.0 - SUCCESS_PROB)/np.log(1 - 0.5**SAMPLE_SIZE))
     
     # Let the initial error be large i.e consider all matched points as outliers
@@ -116,7 +117,7 @@ def compute_homography_ransac(pts_dst, pts_src, CONFIDENCE_THRESH = 65, OUTLIER_
             
     best_confidence_obtained = int(100 - (100 * lowest_outliers_count / num_all_matches))
     if best_confidence_obtained < CONFIDENCE_THRESH:
-        raise Exception('Coudn\'t obtain confidence ratio higher than the CONFIDENCE THRESH')
+        raise Exception('The obtained confidence ratio was {best_confidence_obtained}% which is not higher than {CONFIDENCE_THRESH}%')
 
     return best_h_mat
 
