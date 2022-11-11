@@ -5,19 +5,19 @@ import math
 
 # 1.1 Getting Correspondences
 # Feature of the two image using SIFT
-
-
 def get_image_sift_feature(img):
+    assert img.ndim == 2
+    
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # create SIFT object
     sift = cv2.SIFT_create()
     # detect SIFT features in both images
     keypoints, descriptors = sift.detectAndCompute(gray, None)
+
     return keypoints, descriptors
 
+
 # Get the matched feature between the two image
-
-
 def get_matches(des1, des2, ratio=0.75):
     # Brute force matcher
     bf = cv2.BFMatcher()
