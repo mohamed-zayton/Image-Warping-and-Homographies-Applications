@@ -39,7 +39,7 @@ def get_matched_pt(kpt, matched_list, num_pts=50):
     return pts
 
 # Get the homograph matrix using the SVD
-def get_homograph_mat(pts_src, pts_dst):
+def get_homograph_mat(pts_dst, pts_src):
     a_mat = np.zeros((pts_src.shape[0] * 2, 9))
 
     # Build the A matrix Ah=0
@@ -69,7 +69,7 @@ def transform_with_homography(h_mat, points_array):
     
     return transformed_points
     
-def compute_outliers(h_mat, points_img_a, points_img_b, threshold=3):
+def compute_outliers(h_mat, points_img_a, points_img_b, threshold):
     outliers_count = 0
 
     # transform the match point in image B to image A using the homography
@@ -85,11 +85,12 @@ def compute_outliers(h_mat, points_img_a, points_img_b, threshold=3):
     for dis in euclid_dis:
         if dis > threshold:
             outliers_count += 1
+
     return outliers_count
 
 
-def compute_homography_ransac(matches_a, matches_b, CONFIDENCE_THRESH = 65):
-    num_all_matches =  matches_a.shape[0]
+def compute_homography_ransac(pts_dst, pts_src, CONFIDENCE_THRESH = 65, OUTLIER_DIS_THRESH = 3):
+    num_all_matches =  pts_dst.shape[0]
     # RANSAC parameters
     SAMPLE_SIZE = 5 #number of point correspondances for estimation of Homgraphy
     SUCCESS_PROB = 0.995 #required probabilty of finding H with all samples being inliners 
@@ -101,15 +102,15 @@ def compute_homography_ransac(matches_a, matches_b, CONFIDENCE_THRESH = 65):
 
     for i in range(min_iterations):
         rand_ind = np.random.permutation(range(num_all_matches))[:SAMPLE_SIZE]
-        h_mat = cv2.findHomography(matches_a[rand_ind], matches_b[rand_ind])
-        outliers_count = compute_outliers(h_mat, matches_a, matches_b)
+        h_mat = get_homograph_mat(pts_dst[rand_ind], pts_src[rand_ind])
+        outliers_count = compute_outliers(h_mat, pts_dst, pts_src, OUTLIER_DIS_THRESH)
         if outliers_count < lowest_outliers_count:
             best_h_mat = h_mat
             lowest_outliers_count = outliers_count
             
     best_confidence_obtained = int(100 - (100 * lowest_outliers_count / num_all_matches))
     if best_confidence_obtained < CONFIDENCE_THRESH:
-        raise('Coudn\'t obtain confidence ratio higher than the CONFIDENCE THRESH')
+        raise Exception('Coudn\'t obtain confidence ratio higher than the CONFIDENCE THRESH')
 
     return best_h_mat
 
@@ -127,7 +128,7 @@ def show_image(img, x_axes_visible = False, y_axes_visible = False):
 
 
 def wrap_prespective(img, h, dim):
-    target_img = np.zeros((dim[1], dim[0], 3), dtype=np.uint8)
+    target_img = np.zeros((dim[1], dim[0], 3), dtype=np.float64)
     count_mat = np.zeros((dim[1], dim[0]), dtype=np.int32)
     for y in range(len(img)):
         for x in range(len(img[y])):
@@ -164,4 +165,4 @@ def wrap_prespective(img, h, dim):
             target_img[y, x, 1] = int(np.round(target_img[y, x, 1] / count_mat[y, x]))
             target_img[y, x, 2] = int(np.round(target_img[y, x, 2] / count_mat[y, x]))
 
-    return target_img
+    return target_img.astype(np.uint8)
