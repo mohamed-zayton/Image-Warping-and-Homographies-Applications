@@ -124,3 +124,44 @@ def show_image(img, x_axes_visible = False, y_axes_visible = False):
   ax.axes.get_xaxis().set_visible(x_axes_visible)
   ax.axes.get_yaxis().set_visible(y_axes_visible)
   plt.show()
+
+
+def wrap_prespective(img, h, dim):
+    target_img = np.zeros((dim[1], dim[0], 3), dtype=np.uint8)
+    count_mat = np.zeros((dim[1], dim[0]), dtype=np.int32)
+    for y in range(len(img)):
+        for x in range(len(img[y])):
+            curr_coord = [[x], [y], [1]]
+            new_coord = np.dot(h, curr_coord)
+            new_coord[0][0] /= new_coord[2][0]
+            new_coord[1][0] /= new_coord[2][0]
+            upper_x = int(math.ceil(new_coord[0][0]))
+            lower_x = int(math.floor(new_coord[0][0]))
+            upper_y = int(math.ceil(new_coord[1][0]))
+            lower_y = int(math.floor(new_coord[1][0]))
+            if lower_x >= 0 and lower_x < dim[0] and lower_y >= 0 and lower_y < dim[1]:
+                target_img[lower_y, lower_x, :] += img[y, x, :]
+                count_mat[lower_y, lower_x] += 1
+
+            if lower_x >= 0 and lower_x < dim[0] and upper_y >= 0 and upper_y < dim[1]:
+                target_img[upper_y, lower_x, :] += img[y, x, :]
+                count_mat[upper_y, lower_x] += 1
+
+            if upper_x >= 0 and upper_x < dim[0] and lower_y >= 0 and lower_y < dim[1]:
+                target_img[lower_y, upper_x, :] += img[y, x, :]
+                count_mat[lower_y, upper_x] += 1
+
+            if upper_x >= 0 and upper_x < dim[0] and upper_y >= 0 and upper_y < dim[1]:
+                target_img[upper_y, upper_x, :] += img[y, x, :]
+                count_mat[upper_y, upper_x] += 1
+            
+    
+    for y in range(len(target_img)):
+        for x in range(len(target_img[y])):
+            if count_mat[y, x] == 0:
+                continue
+            target_img[y, x, 0] = int(np.round(target_img[y, x, 0] / count_mat[y, x]))
+            target_img[y, x, 1] = int(np.round(target_img[y, x, 1] / count_mat[y, x]))
+            target_img[y, x, 2] = int(np.round(target_img[y, x, 2] / count_mat[y, x]))
+
+    return target_img
