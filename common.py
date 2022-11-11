@@ -54,3 +54,59 @@ def get_homograph_mat(pts_src, pts_dst):
     homography_mat = (V[-1] / V[-1][-1]).reshape((3, 3))
 
     return homography_mat
+
+
+def transform_with_homography(h_mat, points_array):
+    # add column of ones so that matrix multiplication with homography matrix is possible
+    ones_col = np.ones((points_array.shape[0], 1))
+    points_array = np.concatenate((points_array, ones_col), axis=1)
+    transformed_points = np.matmul(h_mat, points_array.T)
+    epsilon = 1e-7 # very small value to use it during normalization to avoid division by zero
+    transformed_points = transformed_points / (transformed_points[2,:].reshape(1,-1) + epsilon)
+    transformed_points = transformed_points[0:2,:].T
+    
+    return transformed_points
+    
+def compute_outliers(h_mat, points_img_a, points_img_b, threshold=3):
+    outliers_count = 0
+
+    # transform the match point in image B to image A using the homography
+    points_img_b_hat = transform_with_homography(h_mat, points_img_b)
+    
+    # let x, y be coordinate representation of points in image A
+    # let x_hat, y_hat be the coordinate representation of transformed points of image B with respect to image A
+    x = points_img_a[:, 0]
+    y = points_img_a[:, 1]
+    x_hat = points_img_b_hat[:, 0]
+    y_hat = points_img_b_hat[:, 1]
+    euclid_dis = np.sqrt(np.power((x_hat - x), 2) + np.power((y_hat - y), 2)).reshape(-1)
+    for dis in euclid_dis:
+        if dis > threshold:
+            outliers_count += 1
+    return outliers_count
+
+
+def compute_homography_ransac(matches_a, matches_b, CONFIDENCE_THRESH = 65):
+    num_all_matches =  matches_a.shape[0]
+    # RANSAC parameters
+    SAMPLE_SIZE = 5 #number of point correspondances for estimation of Homgraphy
+    SUCCESS_PROB = 0.995 #required probabilty of finding H with all samples being inliners 
+    min_iterations = int(np.log(1.0 - SUCCESS_PROB)/np.log(1 - 0.5**SAMPLE_SIZE))
+    
+    # Let the initial error be large i.e consider all matched points as outliers
+    lowest_outliers_count = num_all_matches
+    best_h_mat = None
+
+    for i in range(min_iterations):
+        rand_ind = np.random.permutation(range(num_all_matches))[:SAMPLE_SIZE]
+        h_mat = cv2.findHomography(matches_a[rand_ind], matches_b[rand_ind])
+        outliers_count = compute_outliers(h_mat, matches_a, matches_b)
+        if outliers_count < lowest_outliers_count:
+            best_h_mat = h_mat
+            lowest_outliers_count = outliers_count
+            
+    best_confidence_obtained = int(100 - (100 * lowest_outliers_count / num_all_matches))
+    if best_confidence_obtained < CONFIDENCE_THRESH:
+        raise('Coudn\'t obtain confidence ratio higher than the CONFIDENCE THRESH')
+
+    return best_h_mat
