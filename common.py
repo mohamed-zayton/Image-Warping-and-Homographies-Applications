@@ -37,23 +37,20 @@ def get_matched_pt(kpt, matched_list, num_pts=50):
     return pts
 
 # Get the homograph matrix using the SVD
-def get_homograph_mat(pts1, pts2):
-    a_mat = np.zeros((pts1.shape[0] * 2, 9))
-    ind = 0
+def get_homograph_mat(pts_src, pts_dst):
+    a_mat = np.zeros((pts_src.shape[0] * 2, 9))
+
     # Build the A matrix Ah=0
-    for i, (pt1, pt2) in enumerate(zip(pts1, pts2)):
-        x = pt1[0][0]
-        y = pt1[0][1]
-        xd = pt2[0][0]
-        yd = pt2[0][1]
-        x_xd = x * xd
-        y_xd = y * xd
-        x_yd = x * yd
-        y_yd = y * yd
-        a_mat[ind][0], a_mat[ind][1], a_mat[ind][2], a_mat[ind][6], a_mat[ind][7], a_mat[ind][8] = -x, -y, -1, x_xd, y_xd, xd
-        a_mat[ind+1][3], a_mat[ind+1][4], a_mat[ind+1][5], a_mat[ind +1][6], a_mat[ind+1][7], a_mat[ind+1][8] = -x, -y, -1, x_yd, y_yd, yd
-        ind += 2
+    for i in range(len(pts_src)):
+        x = pts_src[i][0]
+        y = pts_src[i][1]
+        x_dash = pts_dst[i][0]
+        y_dash = pts_dst[i][1]
+        a_mat[i * 2] += [-x , -y, -1, 0, 0, 0, x * x_dash, y * x_dash, x_dash]
+        a_mat[i * 2 + 1] += [0, 0, 0, -x, -y, -1, x * y_dash, y * y_dash, y_dash]
+
     U, D, V = np.linalg.svd(a_mat, full_matrices=False)
     # Smallest singular value
     homography_mat = (V[-1] / V[-1][-1]).reshape((3, 3))
+
     return homography_mat
