@@ -10,7 +10,7 @@ import math
 def get_image_sift_feature(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # create SIFT object
-    sift = cv2.xfeatures2d.SIFT_create()
+    sift = cv2.SIFT_create()
     # detect SIFT features in both images
     keypoints, descriptors = sift.detectAndCompute(gray, None)
     return keypoints, descriptors
@@ -34,8 +34,8 @@ def get_matches(des1, des2, ratio=0.75):
 # The point that match the 2 image
 
 def get_matched_pt(kpt, matched_list, num_pts=50):
-    pts = np.float32(
-        [kpt[m[0].queryIdx].pt for m in matched_list[:num_pts]]).reshape(-1, 1, 2)
+    pts = np.float32([kpt[m[0].queryIdx].pt for m in matched_list[:num_pts]])
+    pts = pts.reshape(-1, 1, 2)
     return pts
 
 # Get the homograph matrix using the SVD
