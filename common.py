@@ -120,7 +120,7 @@ def compute_homography_ransac(pts_dst, pts_src, CONFIDENCE_THRESH = 65, OUTLIER_
             
     best_confidence_obtained = int(100 - (100 * lowest_outliers_count / num_all_matches))
     if best_confidence_obtained < CONFIDENCE_THRESH:
-        raise Exception('The obtained confidence ratio was {best_confidence_obtained}% which is not higher than {CONFIDENCE_THRESH}%')
+        raise Exception(f'The obtained confidence ratio was {best_confidence_obtained}% which is not higher than {CONFIDENCE_THRESH}%')
 
     return best_h_mat
 
