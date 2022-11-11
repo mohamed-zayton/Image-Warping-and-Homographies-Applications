@@ -10,12 +10,15 @@ SUCCESS_PROB = 0.995 #required probabilty of finding H with all samples being in
 # 1.1 Getting Correspondences
 # Feature of the two image using SIFT
 def get_image_sift_feature(img):
-    assert img.ndim == 2, "Image should be gray scale"
+    # Check if the image need to be converted to gray
+    gray_img = img
+    if img.ndim != 2:
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # create SIFT object
     sift = cv2.SIFT_create()
     # detect SIFT features in both images
-    keypoints, descriptors = sift.detectAndCompute(img, None)
+    keypoints, descriptors = sift.detectAndCompute(gray_img, None)
 
     return keypoints, descriptors
 
