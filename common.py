@@ -6,13 +6,12 @@ import math
 # 1.1 Getting Correspondences
 # Feature of the two image using SIFT
 def get_image_sift_feature(img):
-    assert img.ndim == 2
-    
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    assert img.ndim == 2, "Image should be gray scale"
+
     # create SIFT object
     sift = cv2.SIFT_create()
     # detect SIFT features in both images
-    keypoints, descriptors = sift.detectAndCompute(gray, None)
+    keypoints, descriptors = sift.detectAndCompute(img, None)
 
     return keypoints, descriptors
 
@@ -32,10 +31,17 @@ def get_matches(des1, des2, ratio=0.75):
 
 # 1.2 Compute the Homography Parameters
 # The point that match the 2 image
+def get_matched_pt(kpt, matched_list, points_type = 0, num_pts=50):
+    # TODO: check if the function returning the desirable array shape
+    """Function to extract the (x, y) points from brute-force knn matcher points
+    
+    Args:
+        kpt (cv2.KeyPoint array): of shape (n, 1)
+        matched_list (2D cv2.DMatch array): of shape (n, 1, 1) represting n set of x, y points
+        points_type (number): pass 0 for query points, and 1 for train points
+    """
+    pts = np.float32([kpt[m[0].queryIdx if points_type == 0 else m[0].trainIdx].pt for m in matched_list[:num_pts]])
 
-def get_matched_pt(kpt, matched_list, num_pts=50):
-    pts = np.float32([kpt[m[0].queryIdx].pt for m in matched_list[:num_pts]])
-    pts = pts.reshape(-1, 1, 2)
     return pts
 
 # Get the homograph matrix using the SVD
