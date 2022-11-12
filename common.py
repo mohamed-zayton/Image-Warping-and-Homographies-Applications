@@ -158,12 +158,27 @@ def wrap_prespective(img, h, dim):
                         count_mat[new_y, new_x] += 1
             
     
+    h_inv = np.linalg.inv(h)
     for y in range(len(target_img)):
         for x in range(len(target_img[y])):
             if count_mat[y, x] == 0:
-                continue
-            target_img[y, x, 0] = int(np.round(target_img[y, x, 0] / count_mat[y, x]))
-            target_img[y, x, 1] = int(np.round(target_img[y, x, 1] / count_mat[y, x]))
-            target_img[y, x, 2] = int(np.round(target_img[y, x, 2] / count_mat[y, x]))
+                curr_coord = [[x], [y], [1]]
+                new_coord = np.dot(h_inv, curr_coord)
+                new_coord[0][0] /= new_coord[2][0]
+                new_coord[1][0] /= new_coord[2][0]
+                new_x_points = [int(math.floor(new_coord[0][0])), int(math.ceil(new_coord[0][0]))]
+                new_y_points = [int(math.floor(new_coord[1][0])), int(math.ceil(new_coord[1][0]))]
+                weighted_intenisty_sum = np.array([0, 0, 0], dtype=np.float64)
+                for new_x in new_x_points:
+                    for new_y in new_y_points:
+                        if not point_is_out_of_range((new_x, new_y), (img.shape[1], img.shape[0])):
+                            weighted_intenisty_sum += abs(new_x - new_coord[0][0]) * abs(new_y - new_coord[1][0]) * img[new_y, new_x]
+                
+                target_img[y, x] += weighted_intenisty_sum / 4
+
+            else:
+                target_img[y, x, 0] = int(np.round(target_img[y, x, 0] / count_mat[y, x]))
+                target_img[y, x, 1] = int(np.round(target_img[y, x, 1] / count_mat[y, x]))
+                target_img[y, x, 2] = int(np.round(target_img[y, x, 2] / count_mat[y, x]))
 
     return target_img.astype(np.uint8)
