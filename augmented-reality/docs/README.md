@@ -177,6 +177,9 @@ plt.imshow(dst[:,:,::-1])
 
 ![Overlay][overlay]
 
+We also show the results using the corners approach.
+
+![Overlay][overlay_corners]
 ### Putting it all together
 
 Finally, we repeat the process for all the frames in the video, and save the result.
@@ -189,3 +192,4 @@ Finally, we repeat the process for all the frames in the video, and save the res
 [homoestimate]: ./img/homoestimate
 [corners]: ./img/corners.png
 [overlay]: ./img/ready.png
+[overlay_corners]: ./img/corners_overlay.png
