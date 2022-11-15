@@ -172,9 +172,12 @@ def wrap_prespective(img, h, dim):
                 for new_x in new_x_points:
                     for new_y in new_y_points:
                         if not point_is_out_of_range((new_x, new_y), (img.shape[1], img.shape[0])):
-                            weighted_intenisty_sum += abs(new_x - new_coord[0][0]) * abs(new_y - new_coord[1][0]) * img[new_y, new_x]
+                            weight = abs(new_x - new_coord[0][0]) * abs(new_y - new_coord[1][0])
+                            weighted_intenisty_sum += weight * img[new_y, new_x]
+                            weights_sum += weight
+                
+                target_img[y, x] += weighted_intenisty_sum / (weights_sum if weights_sum != 0 else 1)
 
-                target_img[y, x] += weighted_intenisty_sum / 4
 
             else:
                 target_img[y, x, 0] = int(np.round(target_img[y, x, 0] / count_mat[y, x]))
