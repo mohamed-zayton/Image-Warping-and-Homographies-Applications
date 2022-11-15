@@ -19,8 +19,8 @@ Mohamed Zyton | 6670
 <!-- References -->
 [docs-badge2]: https://img.shields.io/badge/Image_Mosaics_Docs-blue
 
-[mosaics-docs]: Image%20Mosaics\docs\image_mosaics.md
+[mosaics-docs]: https://github.com/mohamed-zayton/Image-Warping-and-Homographies-Applications/blob/augmented-reality/Image%20Mosaics/docs/image_mosaics.md
 
 [docs-badge]: https://img.shields.io/badge/Augmented_Reality_Docs-blue
 
-[ar-docs]: augmented-reality\docs\README.md
+[ar-docs]: https://github.com/mohamed-zayton/Image-Warping-and-Homographies-Applications/blob/augmented-reality/augmented-reality/docs/README.md
