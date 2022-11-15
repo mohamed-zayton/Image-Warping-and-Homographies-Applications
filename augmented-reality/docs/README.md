@@ -180,10 +180,12 @@ plt.imshow(dst[:,:,::-1])
 We also show the results using the corners approach.
 
 ![Overlay][overlay_corners]
+
 ### Putting it all together
 
 Finally, we repeat the process for all the frames in the video, and save the result.
 
+[![video result][video_badge]][out_link]
 <!-- References -->
 
 [cover_detection]: ./img/cover_detection.png
@@ -193,3 +195,5 @@ Finally, we repeat the process for all the frames in the video, and save the res
 [corners]: ./img/corners.png
 [overlay]: ./img/ready.png
 [overlay_corners]: ./img/corners_overlay.png
+[out_link]: https://drive.google.com/drive/folders/1-AdBXaxfd_4z_bxsJoxAFi-_UA1XCNf_?usp=share_link
+[video_badge]: https://img.shields.io/badge/Video-Result-red
