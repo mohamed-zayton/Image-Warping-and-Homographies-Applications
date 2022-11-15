@@ -5,7 +5,7 @@ import cv2
 
 from common import *
 
-def cover_to_book_homography(kp_cover, des_cover, book_gray)->np.ndarray:
+def cover_to_book_homography(kp_cover, des_cover, book_gray,ransac=False)->np.ndarray:
     # Calculate homography from cover to book
     # Input: cover - cover image
     #        book - book image
@@ -23,7 +23,7 @@ def cover_to_book_homography(kp_cover, des_cover, book_gray)->np.ndarray:
     pts_book = get_matched_pt(kp_book, matches, points_type=1)
 
     # Find the homography matrix
-    mat = get_homograph_mat(pts_book, pts_cover)
+    mat =compute_homography_ransac(pts_book,pts_cover) if ransac else get_homograph_mat(pts_book, pts_cover)
     return mat
 
 def trailer_dimensions(trailer_shape,cover_shape)->np.ndarray:
